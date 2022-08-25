@@ -1,0 +1,6 @@
+- name: setup ansible user on managed host(s)
+  hosts: all
+  tasks:
+    - name: debug
+      debug:
+        var: ansible_facts

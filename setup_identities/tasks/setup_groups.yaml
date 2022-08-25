@@ -1,0 +1,8 @@
+- name: create user groups
+  group:
+    name: "{{item.name}}"
+    state: present
+- name: setup sudo groups
+  template:
+    src: templates/sudo_groups.j2
+    dest: /etc/sudoers.d/sudo_groups

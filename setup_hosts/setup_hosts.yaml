@@ -1,0 +1,54 @@
+---
+- name: setup default ansible user on controller
+  vars_files:
+  - vars/ansible_user.yaml
+  hosts: localhost
+  tasks:
+  - name: create ansible user on controller
+    import_tasks: tasks/add_default_ansible_user.yaml
+  - name: cat id_rsa.pub to rs_cat
+    command: 'cat /home/{{ansible_username}}/.ssh/id_rsa.pub'
+    register: rs_cat
+  - name: set_fact ansible user to ['localhost']['ansible_pub_key']
+    set_fact:
+      ansible_pub_key: "{{rs_cat.stdout}}"
+    when: rs_cat.rc == 0
+  
+- name: setup host(s) on controller
+  hosts: localhost
+  vars_files:
+  - vars/managed_hosts.yaml
+  tasks:
+  - name: backup /etc/hosts
+    copy:
+      src: /etc/hosts
+      dest: /etc/hosts_{{ansible_facts['date_time']['date']}}_{{ansible_facts['date_time']['time']}}
+    changed_when: false
+  - name: manage inventory
+    template:
+      src: templates/inventory.j2
+      dest: inventory
+  - name: manage /etc/hosts
+    template:
+      src: templates/hosts.j2
+      dest: /etc/hosts
+
+- name: setup ansible user on managed host(s)
+  vars_files:
+  - vars/ansible_user.yaml
+  - vars/redhat_account.yaml
+  hosts: all
+  tasks:
+  - name: create ansible user
+    import_tasks: tasks/add_default_ansible_user.yaml
+  - name: copy ansible user id_rsa.pub to host
+    authorized_key:
+      user: "{{ansible_username}}"
+      key: "{{hostvars['localhost']['ansible_pub_key']}}"
+  - name: register to rh
+    redhat_subscription:
+      username: "{{redhat_account}}"
+      password: "{{redhat_account_pw}}"
+      state: present
+      auto_attach: true
+      force_register: true

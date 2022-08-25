@@ -1,0 +1,21 @@
+- name: create users with groups
+  user:
+    name: "{{item.name}}"
+    groups: "{{item.groups}}"
+    password: "{{ item.password | password_hash('sha512') }}"
+    generate_ssh_key: true
+    ssh_key_comment: "{{item.name}}@{{ansible_facts['fqdn']}}"
+    state: present
+  when: item.groups is defined
+- name: create users without groups
+  user:
+    name: "{{item.name}}"
+    password: "{{ item.password | password_hash('sha512') }}"
+    generate_ssh_key: true
+    ssh_key_comment: "{{item.name}}@{{ansible_facts['fqdn']}}"
+    state: present
+  when: item.groups is not defined
+- name: setup sudo users
+  template:
+    src: templates/sudo_users.j2
+    dest: /etc/sudoers.d/sudo_users

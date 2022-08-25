@@ -1,0 +1,34 @@
+---
+- name: create users and groups on controller
+  hosts: localhost
+  vars_files:
+  - vars/users_groups.yaml
+  tasks:
+  - name: setup user groups
+    include_tasks: tasks/setup_groups.yaml
+    loop: "{{user_groups}}"
+  - name: setup users
+    include_tasks: tasks/setup_users.yaml
+    loop: "{{users}}"
+  - name: store id_rsa.pub to hostvars['localhost']['pubkey']['username']
+    include_tasks: tasks/store_user_pub_key.yaml
+    loop: "{{users}}"
+  tags: setup-local
+
+- name: create users and groups on managed hosts
+  hosts: all
+  vars_files:
+  - vars/users_groups.yaml
+  tasks:
+  - name: setup groups
+    include_tasks: tasks/setup_groups.yaml
+    loop: "{{user_groups}}"
+  - name: setup users
+    include_tasks: tasks/setup_users.yaml
+    loop: "{{users}}"
+  - name: copy authorized keys
+    authorized_key:
+      user: "{{item.name}}"
+      key: "{{hostvars['localhost']['pubkey'][item.name]}}"
+    loop: "{{users}}"
+  tags: setup-remote

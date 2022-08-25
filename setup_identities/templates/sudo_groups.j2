@@ -1,0 +1,5 @@
+{% for group in user_groups %}
+{% if (group['sudo'] is defined and group['sudo'] == true) %}
+%{{group['name']}} ALL=(ALL:ALL) NOPASSWD:ALL
+{% endif %}
+{% endfor %}

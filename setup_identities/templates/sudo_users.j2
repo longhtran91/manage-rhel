@@ -1,0 +1,5 @@
+{% for user in users %}
+{% if (user['sudo'] is defined and user['sudo'] == true) %}
+{{user['name']}} ALL=(ALL:ALL) NOPASSWD:ALL
+{% endif %}
+{% endfor %}

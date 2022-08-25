@@ -1,0 +1,13 @@
+managed_hosts:
+- hostname: ansible1
+  ipv4: 172.16.1.241
+  domain: example.com
+- hostname: ansible2
+  ipv4: 172.16.1.242
+  domain: example.com
+- hostname: ansible3
+  ipv4: 172.16.1.243
+  domain: example.com
+- hostname: ansible4
+  ipv4: 172.16.1.244
+  domain: example.com

@@ -1,0 +1,23 @@
+user_groups:
+  - name: admin
+    sudo: true
+  - name: power_user
+    sudo: true
+  - name: marketing
+  - name: it
+
+users:
+  - name: bill
+    password: password
+    groups: [admin, it]
+  - name: ted
+    password: password
+    groups: [marketing]
+  - name: tracy
+    password: password
+  - name: supersu1
+    password: password
+    sudo: true
+  - name: supersu2
+    password: password
+    sudo: true

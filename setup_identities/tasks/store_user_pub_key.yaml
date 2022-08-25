@@ -1,0 +1,7 @@
+- name: cat id_rsa.pub to rs_cat
+  command: 'cat /home/{{item.name}}/.ssh/id_rsa.pub'
+  register: rs_cat
+- name: set_fact id_rsa.pub to ['localhost']['pubkey']['username']
+  set_fact:
+     pubkey: "{{ pubkey|default({}) | combine( { item.name: rs_cat.stdout } ) }}"
+  when: rs_cat.rc == 0
